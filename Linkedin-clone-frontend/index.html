@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Clone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f2e8;
+            min-height: 100vh;
+        }
+
+        /* Login Page - Full Screen */
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f5f2e8;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-header h1 {
+            color: #0077b5;
+            font-size: 48px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .login-header h2 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 400;
+        }
+
+        .login-form {
+            width: 100%;
+            max-width: 450px;
+            padding: 0 20px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            background: white;
+            font-family: inherit;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #0077b5;
+        }
+
+        .signin-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #0077b5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .signin-btn:hover {
+            background-color: #005582;
+        }
+
+        .error-message {
+            color: #d11124;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Feed Page - Full Screen */
+        .feed-page {
+            min-height: 100vh;
+            background: #f5f2e8;
+        }
+
+        .feed-navbar {
+            background: #0077b5;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .feed-navbar h2 {
+            font-size: 28px;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            padding: 10px 25px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: #0077b5;
+        }
+
+        .feed-content {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .feed-content h3 {
+            color: #333;
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .feed-post {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .post-author {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .post-content {
+            color: #666;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script>
+        // Login page HTML with Name, Email, Password, and Post Content fields
+        const loginHTML = `
+            <div class="login-page">
+                <div class="login-header">
+                    <h1>LinkedIn</h1>
+                    <h2>Sign in</h2>
+                </div>
+                <div class="login-form">
+                    <div class="input-group">
+                        <label>Name</label>
+                        <input type="text" id="name" placeholder="Enter your name">
+                        <div id="nameError" class="error-message">Name is required</div>
+                    </div>
+                    <div class="input-group">
+                        <label>Email or phone</label>
+                        <input type="text" id="email" placeholder="Email or phone">
+                        <div id="emailError" class="error-message">Email or phone is required</div>
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" id="password" placeholder="Password">
+                        <div id="passwordError" class="error-message">Password required</div>
+                    </div>
+                    <div class="input-group">
+                        <label>What do you want to post?</label>
+                        <textarea id="postContent" placeholder="Enter your post content...">Hello LinkedIn Clone</textarea>
+                        <div id="postError" class="error-message">Post content is required</div>
+                    </div>
+                    <button class="signin-btn" onclick="validateAndLogin()">Sign in</button>
+                </div>
+            </div>
+        `;
+
+        function showLogin() {
+            document.getElementById('root').innerHTML = loginHTML;
+        }
+
+        function validateAndLogin() {
+            // Get input values
+            const name = document.getElementById('name')?.value;
+            const email = document.getElementById('email')?.value;
+            const password = document.getElementById('password')?.value;
+            const postContent = document.getElementById('postContent')?.value;
+            
+            // Get error elements
+            const nameError = document.getElementById('nameError');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const postError = document.getElementById('postError');
+            
+            // Hide all errors initially
+            nameError.style.display = 'none';
+            emailError.style.display = 'none';
+            passwordError.style.display = 'none';
+            postError.style.display = 'none';
+            
+            let isValid = true;
+            
+            // Validate Name
+            if (!name || name.trim() === '') {
+                nameError.style.display = 'block';
+                isValid = false;
+            }
+            
+            // Validate Email
+            if (!email || email.trim() === '') {
+                emailError.style.display = 'block';
+                isValid = false;
+            }
+            
+            // Validate Password
+            if (!password || password.trim() === '') {
+                passwordError.style.display = 'block';
+                isValid = false;
+            }
+            
+            // Validate Post Content
+            if (!postContent || postContent.trim() === '') {
+                postError.style.display = 'block';
+                isValid = false;
+            }
+            
+            // If valid, show feed with the entered name and post content
+            if (isValid) {
+                showFeed(name, postContent);
+            }
+        }
+
+        function showFeed(userName, userPost) {
+            // Use the entered values or defaults
+            const displayName = userName || "Ajay";
+            const displayPost = userPost || "Hello LinkedIn Clone";
+            
+            document.getElementById('root').innerHTML = `
+                <div class="feed-page">
+                    <div class="feed-navbar">
+                        <h2>LinkedIn</h2>
+                        <button class="logout-btn" onclick="showLogin()">Logout</button>
+                    </div>
+                    <div class="feed-content">
+                        <h3>Feed</h3>
+                        <div class="feed-post">
+                            <div class="post-author">${displayName}</div>
+                            <div class="post-content">${displayPost}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize with login page
+        showLogin();
+
+        // Make functions global
+        window.showLogin = showLogin;
+        window.validateAndLogin = validateAndLogin;
+        window.showFeed = showFeed;
+    </script>
+</body>
+</html>
